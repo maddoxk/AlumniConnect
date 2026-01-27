@@ -1,7 +1,7 @@
 # AlumniConnect
 
 A modern alumni networking platform powered by AI. Connect with former classmates, find mentors, and discover career opportunities through intelligent matching.
-
+https://alumniconnect-flame.vercel.app/#/chat
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
