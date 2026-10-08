@@ -491,3 +491,53 @@ export const getChatState = (): { messages: ChatMessage[], input: string } | nul
 export const clearChatState = () => {
   sessionStorage.removeItem(CHAT_HISTORY_KEY);
 };
+
+export const clearInteractions = () => {
+  localStorage.removeItem(INTERACTIONS_KEY);
+};
+
+export const exportAlumniToCSV = (profiles?: AlumniProfile[]): string => {
+  const list = profiles || getAlumni();
+  const headers = ['Name', 'Headline', 'Company', 'Industry', 'Location', 'Graduation Year', 'Major', 'Email', 'Skills', 'Last Updated'];
+  const rows = list.map(p => [
+    `"${(p.name || '').replace(/"/g, '""')}"`,
+    `"${(p.headline || p.currentRole || '').replace(/"/g, '""')}"`,
+    `"${(p.company || '').replace(/"/g, '""')}"`,
+    `"${(p.industry || '').replace(/"/g, '""')}"`,
+    `"${(p.location || '').replace(/"/g, '""')}"`,
+    p.gradYear,
+    `"${(p.major || '').replace(/"/g, '""')}"`,
+    `"${(p.email || '').replace(/"/g, '""')}"`,
+    `"${(p.skills || []).join('; ')}"`,
+    `"${p.lastUpdated || ''}"`,
+  ]);
+  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+};
+
+export const exportDatabaseToJSON = (): string => {
+  const payload = {
+    metadata: {
+      institution: 'University of Denver',
+      system: 'AlumniConnect Advancement Network',
+      exportedAt: new Date().toISOString(),
+    },
+    alumni: getAlumni(),
+    interactions: getInteractions(),
+  };
+  return JSON.stringify(payload, null, 2);
+};
+
+export const getDatabaseStats = () => {
+  const alumni = getAlumni();
+  const interactions = getInteractions();
+  const rawStorage = (localStorage.getItem(ALUMNI_KEY) || '').length + (localStorage.getItem(INTERACTIONS_KEY) || '').length;
+  const industries = new Set(alumni.map(a => a.industry).filter(i => i && i !== '-'));
+  
+  return {
+    totalAlumni: alumni.length,
+    totalInteractions: interactions.length,
+    distinctIndustries: industries.size,
+    approxStorageBytes: rawStorage,
+    lastSync: 'Fall 2026 Active Cohort',
+  };
+};

@@ -1,9 +1,10 @@
-
 import React, { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Mail, MapPin, Briefcase, Calendar, 
-  Linkedin, Shield, Plus, MessageSquare, Phone, Users
+  Linkedin, Shield, Plus, MessageSquare, Phone, 
+  Users, CheckCircle2, Copy, Check, ExternalLink,
+  GraduationCap, Clock, Building, Award
 } from 'lucide-react';
 import { getAlumni, getInteractions, addInteraction } from '../services/db';
 import { Interaction } from '../types';
@@ -14,210 +15,330 @@ const AlumniDetail = () => {
   const [showInteractionForm, setShowInteractionForm] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [type, setType] = useState<Interaction['type']>('Email');
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [interactionList, setInteractionList] = useState<Interaction[]>([]);
 
   const alumni = useMemo(() => getAlumni().find(a => a.id === id), [id]);
-  const interactions = useMemo(() => getInteractions(id), [id]);
 
-  if (!alumni) return <div className="p-8 text-center text-slate-500">Alumnus not found.</div>;
+  // Load interactions into state so we don't need window.location.reload()
+  React.useEffect(() => {
+    if (id) {
+      setInteractionList(getInteractions(id));
+    }
+  }, [id]);
+
+  if (!alumni) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 text-center space-y-4">
+        <h2 className="text-xl font-bold text-slate-900">Alumnus Record Not Found</h2>
+        <p className="text-xs text-slate-500">The profile ID requested does not exist in the active Pioneer directory.</p>
+        <Link to="/alumni" className="btn-secondary">
+          Return to Directory
+        </Link>
+      </div>
+    );
+  }
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(alumni.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
 
   const handleAddInteraction = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newNote.trim()) return;
+
     const interaction: Interaction = {
       id: Date.now().toString(),
       alumniId: alumni.id,
-      date: new Date().toLocaleDateString(),
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       type,
       notes: newNote,
-      staffName: 'Admin Staff'
+      staffName: 'Advancement Officer'
     };
     addInteraction(interaction);
+    setInteractionList(prev => [...prev, interaction]);
     setNewNote('');
     setShowInteractionForm(false);
-    // In a real app we'd refresh state here
-    window.location.reload();
   };
 
   return (
-    <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-      <button 
-        onClick={() => navigate('/alumni')}
-        className="flex items-center space-x-2 text-slate-500 hover:text-indigo-600 transition-colors"
-      >
-        <ArrowLeft size={18} />
-        <span className="font-medium">Back to Directory</span>
-      </button>
+    <div className="max-w-5xl mx-auto space-y-6 pb-12">
+      {/* Back Link */}
+      <div>
+        <button 
+          onClick={() => navigate('/alumni')}
+          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+        >
+          <ArrowLeft size={14} />
+          <span>Back to Alumni Directory</span>
+        </button>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Card */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div className="w-24 h-24 mx-auto mb-4 rounded-3xl bg-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-200">
-              {alumni.name.split(' ').map(n => n[0]).join('')}
+      {/* Alumnus Executive Dossier Header Card */}
+      <div className="card-institutional p-6 md:p-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div className="flex items-start space-x-5">
+            <div className="w-16 h-16 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xl font-bold shrink-0 border border-slate-700">
+              {alumni.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">{alumni.name}</h1>
-            <p className="text-slate-500 font-medium">{alumni.currentRole} at {alumni.company}</p>
-            
-            <div className="mt-8 pt-8 border-t border-slate-100 space-y-4">
-              <div className="flex items-center justify-center space-x-3 text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer">
-                <Mail size={18} />
-                <span className="text-sm font-medium">{alumni.email}</span>
+            <div>
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="badge-crimson text-[10px]">
+                  Class of {alumni.gradYear}
+                </span>
+                <span className="badge-neutral text-[10px]">
+                  University of Denver Alum
+                </span>
               </div>
-              <div className="flex items-center justify-center space-x-3 text-slate-600">
-                <MapPin size={18} />
-                <span className="text-sm font-medium">{alumni.location}</span>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                {alumni.name}
+              </h1>
+              <p className="text-sm font-medium text-slate-700 mt-0.5">
+                {alumni.headline || alumni.currentRole}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-2">
+                <span className="flex items-center">
+                  <Briefcase size={12} className="mr-1 text-slate-400" />
+                  {alumni.company}
+                </span>
+                <span className="flex items-center">
+                  <MapPin size={12} className="mr-1 text-slate-400" />
+                  {alumni.location}
+                </span>
+                <span className="flex items-center">
+                  <GraduationCap size={12} className="mr-1 text-slate-400" />
+                  {alumni.major}
+                </span>
               </div>
-              <div className="flex items-center justify-center space-x-3 text-slate-600">
-                <Shield size={18} />
-                <span className="text-sm font-medium">{alumni.industry}</span>
-              </div>
-            </div>
-
-            <div className="mt-8 flex justify-center space-x-4">
-               {alumni.linkedinUrl && (
-                 <a href={alumni.linkedinUrl} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
-                    <Linkedin size={20} />
-                 </a>
-               )}
-               <button className="p-3 bg-slate-50 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
-                  <Mail size={20} />
-               </button>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-4">Skills & Expertise</h3>
-            <div className="flex flex-wrap gap-2">
-              {alumni.skills.map(skill => (
-                <span key={skill} className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg">
-                  {skill}
-                </span>
-              ))}
+          {/* Action Buttons Toolbar */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+            <button 
+              onClick={handleCopyEmail}
+              className="btn-secondary"
+              title="Copy official email address"
+            >
+              {copiedEmail ? <Check size={14} className="mr-1.5 text-emerald-600" /> : <Copy size={14} className="mr-1.5 text-slate-400" />}
+              <span>{copiedEmail ? 'Copied' : 'Copy Email'}</span>
+            </button>
+            <a 
+              href={`mailto:${alumni.email}`}
+              className="btn-secondary"
+            >
+              <Mail size={14} className="mr-1.5 text-slate-400" />
+              <span>Send Email</span>
+            </a>
+            <button 
+              onClick={() => setShowInteractionForm(true)}
+              className="btn-primary"
+            >
+              <Plus size={14} className="mr-1.5 text-slate-300" />
+              <span>Log Touchpoint</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Academic & Professional Credentials */}
+        <div className="space-y-6 lg:col-span-1">
+          {/* Record Metadata Card */}
+          <div className="card-institutional p-5 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Institutional Record
+            </h3>
+            
+            <div className="space-y-3 text-xs">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Primary Email</span>
+                <span className="font-mono text-slate-800 break-all">{alumni.email}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Degree / Major</span>
+                <span className="font-semibold text-slate-800">{alumni.major}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Graduation Year</span>
+                <span className="font-semibold text-slate-800 tabular-nums">Class of {alumni.gradYear}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Industry Vertical</span>
+                <span className="font-semibold text-slate-800">{alumni.industry}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Record Last Updated</span>
+                <span className="text-slate-600">{alumni.lastUpdated || 'Current FY26 Cycle'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Core Competencies Card */}
+          <div className="card-institutional p-5 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Core Competencies & Skills
+            </h3>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {alumni.skills && alumni.skills.length > 0 ? (
+                alumni.skills.map(skill => (
+                  <span key={skill} className="badge-neutral text-[11px]">
+                    {skill}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-slate-400">No specific skills indexed</span>
+              )}
+            </div>
+          </div>
+
+          {/* Mentorship & University Engagement Readiness */}
+          <div className="card-institutional p-5 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Campus Engagement Availability
+            </h3>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center space-x-2 text-slate-700">
+                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                <span>Student Career Mentorship</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-700">
+                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                <span>Department Guest Panels</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-700">
+                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                <span>Regional Pioneer Chapter Events</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Detailed Info & History */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Career Overview</h2>
-              <div className="flex items-center space-x-2 text-indigo-600 text-sm font-semibold">
-                <Calendar size={16} />
-                <span>Class of {alumni.gradYear}</span>
-              </div>
-            </div>
-            <div className="space-y-4">
-               <div className="flex items-start space-x-4">
-                  <div className="p-2 bg-indigo-50 rounded-lg shrink-0">
-                    <Briefcase size={20} className="text-indigo-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900">Education</h4>
-                    <p className="text-slate-600 leading-relaxed">
-                      Graduated in {alumni.gradYear} with a degree in {alumni.major}. 
-                    </p>
-                  </div>
-               </div>
-               <div className="flex items-start space-x-4">
-                  <div className="p-2 bg-indigo-50 rounded-lg shrink-0">
-                    <Users size={20} className="text-indigo-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900">About</h4>
-                    <p className="text-slate-600 leading-relaxed">
-                      {alumni.bio || "No detailed bio available yet."}
-                    </p>
-                  </div>
-               </div>
-            </div>
+        {/* Right Column: Bio Summary & Advancement Timeline */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Biography & Overview */}
+          <div className="card-institutional p-6">
+            <h2 className="text-sm font-bold text-slate-900 mb-2">
+              Background Summary
+            </h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {alumni.bio || `${alumni.name} is a University of Denver alumnus who graduated in ${alumni.gradYear} with a degree in ${alumni.major}. Currently serving as ${alumni.headline || 'Professional'} based in ${alumni.location}.`}
+            </p>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-bold text-slate-900">Engagement History</h2>
+          {/* Engagement History Module */}
+          <div className="card-institutional p-6 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div>
+                <h2 className="text-sm font-bold text-slate-900">Advancement Engagement Log</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Staff notes, meeting summaries, and communications history</p>
+              </div>
               <button 
                 onClick={() => setShowInteractionForm(!showInteractionForm)}
-                className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-slate-800 transition-colors"
+                className="btn-secondary"
               >
-                <Plus size={18} />
-                <span>Log Activity</span>
+                <Plus size={14} className="mr-1.5 text-slate-500" />
+                <span>Log New Touchpoint</span>
               </button>
             </div>
 
+            {/* Inline Log Interaction Form */}
             {showInteractionForm && (
-              <form onSubmit={handleAddInteraction} className="mb-8 p-6 bg-slate-50 rounded-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <form onSubmit={handleAddInteraction} className="p-4 bg-slate-50 border border-slate-200/80 rounded-lg space-y-3 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Document Touchpoint</h3>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowInteractionForm(false)}
+                    className="text-slate-400 hover:text-slate-600 text-xs"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Interaction Type</label>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Interaction Medium</label>
                     <select 
-                      className="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 text-slate-800"
                       value={type}
                       onChange={(e) => setType(e.target.value as any)}
                     >
-                      <option>Email</option>
-                      <option>Call</option>
-                      <option>Meeting</option>
-                      <option>LinkedIn</option>
+                      <option value="Email">Email Outreach</option>
+                      <option value="Call">Phone Call</option>
+                      <option value="Meeting">In-Person Meeting</option>
+                      <option value="LinkedIn">LinkedIn Message</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Staff Member</label>
+                    <input 
+                      type="text" 
+                      disabled 
+                      value="Advancement Officer"
+                      className="w-full px-2.5 py-1.5 text-xs bg-slate-100 border border-slate-200 rounded-lg text-slate-600"
+                    />
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Notes</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Engagement Notes</label>
                   <textarea 
-                    className="w-full p-3 bg-white border border-slate-200 rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                    placeholder="Describe the interaction..."
+                    className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 text-slate-800 h-20"
+                    placeholder="Summary of conversation, mentorship interest, career updates, or next steps..."
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
                     required
                   ></textarea>
                 </div>
-                <div className="mt-4 flex justify-end space-x-3">
+
+                <div className="flex justify-end space-x-2 pt-1">
                   <button 
                     type="button" 
                     onClick={() => setShowInteractionForm(false)}
-                    className="px-4 py-2 text-slate-600 font-semibold hover:text-slate-800"
+                    className="btn-secondary"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit" 
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                    className="btn-primary"
                   >
-                    Save Activity
+                    Save to Record
                   </button>
                 </div>
               </form>
             )}
 
-            <div className="space-y-6">
-              {interactions.length > 0 ? (
-                interactions.slice().reverse().map((interaction, i) => (
-                  <div key={interaction.id} className="relative flex space-x-4">
-                    {i !== interactions.length - 1 && (
-                      <div className="absolute left-5 top-10 bottom-0 w-px bg-slate-100"></div>
-                    )}
-                    <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
-                      interaction.type === 'Email' ? 'bg-blue-50 text-blue-600' :
-                      interaction.type === 'Call' ? 'bg-green-50 text-green-600' :
-                      'bg-purple-50 text-purple-600'
-                    }`}>
-                      {interaction.type === 'Email' ? <Mail size={18} /> : 
-                       interaction.type === 'Call' ? <Phone size={18} /> : 
-                       <MessageSquare size={18} />}
-                    </div>
-                    <div className="flex-1 pb-6">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-bold text-slate-900">{interaction.type} with {alumni.name}</h4>
-                        <span className="text-sm text-slate-400 font-medium">{interaction.date}</span>
+            {/* Interaction List */}
+            <div className="space-y-4">
+              {interactionList.length > 0 ? (
+                interactionList.slice().reverse().map((interaction) => (
+                  <div key={interaction.id} className="p-4 bg-slate-50/60 border border-slate-200/60 rounded-lg space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center space-x-2">
+                        <span className="badge-neutral font-semibold">
+                          {interaction.type}
+                        </span>
+                        <span className="text-slate-500">•</span>
+                        <span className="text-slate-500 font-medium">Logged by {interaction.staffName}</span>
                       </div>
-                      <p className="text-slate-600 text-sm mb-2">{interaction.notes}</p>
-                      <p className="text-xs text-slate-400 font-medium italic">Logged by {interaction.staffName}</p>
+                      <span className="text-[11px] text-slate-400 tabular-nums">{interaction.date}</span>
                     </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-normal pt-1">
+                      {interaction.notes}
+                    </p>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  <p className="text-slate-500">No interaction history found for this alumni.</p>
+                <div className="text-center py-10 bg-slate-50/50 rounded-lg border border-dashed border-slate-200 text-xs text-slate-500 space-y-2">
+                  <MessageSquare size={20} className="mx-auto text-slate-300 mb-1" />
+                  <p className="font-medium text-slate-700">No engagement notes recorded for this alumnus</p>
+                  <p className="text-slate-400 max-w-xs mx-auto">
+                    Click "Log New Touchpoint" to document phone calls, coffee chats, or email follow-ups.
+                  </p>
                 </div>
               )}
             </div>

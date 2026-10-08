@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    
+    /* Institutional Design Tokens */
+    --color-canvas: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-surface-subtle: #F1F5F9;
+    --color-surface-active: #E2E8F0;
+    
+    --color-border-subtle: #F1F5F9;
+    --color-border-default: #E2E8F0;
+    --color-border-strong: #CBD5E1;
+    
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #475569;
+    --color-text-muted: #64748B;
+    --color-text-subtle: #94A3B8;
+    
+    --color-brand-crimson: #BA0C2F;
+    --color-brand-crimson-hover: #9B0A27;
+    --color-brand-crimson-subtle: #FFF1F3;
+    
+    --color-brand-navy: #0F172A;
+    --color-brand-navy-light: #1E293B;
+    
+    --color-accent-gold: #C59B27;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Component Classes */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center font-medium text-xs tracking-tight px-3.5 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-900/20 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-crimson {
+    @apply inline-flex items-center justify-center font-medium text-xs tracking-tight px-3.5 py-2 rounded-lg bg-[#BA0C2F] text-white hover:bg-[#9B0A27] active:bg-[#7D0820] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#BA0C2F]/20 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center font-medium text-xs tracking-tight px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center font-medium text-xs tracking-tight px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .badge-neutral {
+    @apply inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/60;
+  }
+
+  .badge-crimson {
+    @apply inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200/60;
+  }
+
+  .badge-emerald {
+    @apply inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/60;
+  }
+
+  .badge-amber {
+    @apply inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/60;
+  }
+
+  .badge-sky {
+    @apply inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200/60;
+  }
+
+  .card-institutional {
+    @apply bg-white border border-slate-200/80 rounded-xl shadow-card transition-all;
+  }
+
+  .card-interactive {
+    @apply bg-white border border-slate-200/80 rounded-xl shadow-card hover:shadow-card-hover hover:border-slate-300 transition-all;
+  }
+}

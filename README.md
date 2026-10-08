@@ -9,39 +9,47 @@ https://alumniconnect-flame.vercel.app/#/chat
 
 ---
 
-## Features
+## Features & Design System
 
-### Dashboard
-- Network overview with key statistics
-- Career heatmap showing industry distribution
-- Personalized alumni recommendations
-- Activity timeline tracking your interactions
+### Advancement Operations Command Center (`/`)
+- Institutional briefing tailored for University Advancement & Alumni Relations officers
+- Analytical KPI metrics: Verified alumni, active employer hubs, tracked touchpoints, and metro density
+- Industry sector horizontal distribution breakdown and cohort momentum
+- Curated high-value alumni for department outreach and panel speaker invitations
+- Live engagement feed tracking staff touchpoints across emails, phone calls, and meetings
 
-### Alumni Directory
-- Browse and search the complete alumni database
-- Filter by industry, location, graduation year, and more
-- View detailed profiles with career history and contact info
+### Alumni Directory & Records (`/alumni`)
+- Dual-view interface: Toggle between **Dense Table View** (advancement data audit) and **Card Grid View**
+- Multi-faceted filtering: Search query, industry verticals, graduation cohorts (2020–2027), and geographic hubs
+- Instant CSV export of filtered records for institutional reporting
+- Spreadsheet (CSV) bulk data ingestion with schema validation
 
-### AI Network Scout
-- Natural language search powered by Google Gemini
-- Semantic matching to find the right connections
-- Example queries:
-  - *"Who has experience in AI or Machine Learning in Colorado?"*
-  - *"Suggest 3 alumni in the Entertainment industry for a guest speaker panel"*
-  - *"Find recent graduates working at Google or Disney"*
+### Alumnus Dossier & Record View (`/alumni/:id`)
+- Institutional alumnus record with graduation credentials, verified badge, and degree details
+- Direct touchpoint logging form (Email, Call, Meeting, LinkedIn Outreach) with staff attribution
+- Enriched skill tags, career bio, and campus engagement readiness flags (Mentorship, Panels, Regional Chapter)
+
+### Advancement Discovery Copilot (`/chat`)
+- Natural language semantic search powered by Google Gemini 3 Flash
+- Grounded query presets for university operations (speaker sourcing, career treks, mentorship matching)
+- Structured match results with direct links to alumnus dossiers
+- Restrained, focused design without gratuitous neon glows or gamified tropes
+
+### System & Database Settings (`/settings`)
+- Database health monitoring and storage footprint diagnostics
+- Full database export (JSON backup and CSV directory export)
+- Gemini GenAI model status and connectivity diagnostics
+- Safe data management (factory dataset restoration, engagement log purge)
 
 ---
 
-## Tech Stack
+## Design System Architecture
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 19, TypeScript |
-| Routing | React Router 7 |
-| Build Tool | Vite 6 |
-| AI Engine | Google Gemini |
-| Charts | Recharts |
-| Icons | Lucide React |
+- **Visual Tone**: Authoritative, restrained, archival institutional modern ("Advancement Operations OS")
+- **Palette**: University of Denver Collegiate Crimson (`#BA0C2F`), Obsidian Navy (`#0F172A`), Slate/Stone neutrals, and crisp borders (`#E2E8F0`)
+- **Typography**: Google Fonts **Plus Jakarta Sans** with clean letter-spacing, tight heading tracking, and tabular numbers (`tnum`) for statistics
+- **Density**: High-utility spacing grid, clean data tables, refined border radii (6px/8px/12px) replacing generic bubbly cards
+- **Design Tokens**: Standardized CSS variables and Tailwind utility classes (`.btn-primary`, `.btn-secondary`, `.btn-crimson`, `.badge-*`, `.card-institutional`)
 
 ---
 
